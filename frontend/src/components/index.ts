@@ -12,3 +12,17 @@ export {
 } from './TrafficPacketTable';
 export type { TrafficTableProps } from './TrafficPacketTable';
 
+export { OsiStackVisualizer } from './OsiStackVisualizer';
+export type { OsiStackVisualizerProps } from './OsiStackVisualizer';
+
+export { OsiLayerAccordionCard } from './OsiLayerAccordionCard';
+export type { OsiLayerAccordionCardProps } from './OsiLayerAccordionCard';
+
+export { HexAsciiPayloadViewer } from './HexAsciiPayloadViewer';
+export type { HexAsciiPayloadViewerProps } from './HexAsciiPayloadViewer';
+
+export { OsiInspector } from './OsiInspector';
+export type { OsiInspectorProps } from './OsiInspector';
+
+export { OSI_PEDAGOGICAL_GUIDES } from './osiPedagogicalGuides';
+export type { OsiLayerKey, OsiPedagogicalLayerGuide } from './osiPedagogicalGuides';
