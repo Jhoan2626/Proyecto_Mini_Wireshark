@@ -47,9 +47,10 @@ El proyecto se rige bajo **Desarrollo Orientado por Especificaciones (SDD)** con
      - `/specs/02-api-flask-streaming.md` ↔ `/frontend/src/tests/Spec02ApiStreamTest.tsx`
      - `/specs/03-tabla-trafico-tiempo-real.md` ↔ `/frontend/src/tests/Spec03TrafficTableTest.tsx`
      - `/specs/04-inspector-visual-osi.md` ↔ `/frontend/src/tests/Spec04OsiInspectorTest.tsx`
+     - `/specs/05-rediseño-frontend-claro-unificado.md` ↔ `/frontend/src/tests/Spec05UnifiedUiTest.tsx`
    - Una fase solo se considera **COMPLETADA** cuando todos los checks automáticos y criterios de aceptación de su arnés `.tsx` correspondiente pasan al 100%.
 3. **Auditoría Integral Final:**
-   - Al concluir las 4 fases secuenciales, un agente de IA auditor ejecutará una validación extremo a extremo (End-to-End) utilizando `TestSuiteRunner.tsx` para certificar la integración entre el backend de la Persona 1 y el frontend de la Persona 2.
+   - Al concluir las 5 fases secuenciales, un agente de IA auditor ejecutará una validación extremo a extremo (End-to-End) utilizando `TestSuiteRunner.tsx` para certificar la integración entre el backend de la Persona 1 y el frontend de la Persona 2.
 
 ---
 
@@ -61,6 +62,7 @@ El proyecto se rige bajo **Desarrollo Orientado por Especificaciones (SDD)** con
 | **Fase 2** | **Persona 1** | Backend / API | [`/specs/02-api-flask-streaming.md`](./specs/02-api-flask-streaming.md) | [`Spec02ApiStreamTest.tsx`](./frontend/src/tests/Spec02ApiStreamTest.tsx) | Servidor Flask multihilo no bloqueante, buffer circular seguro (thread-safe), CORS y endpoints `/api/*`. |
 | **Fase 3** | **Persona 2** | Frontend / UI | [`/specs/03-tabla-trafico-tiempo-real.md`](./specs/03-tabla-trafico-tiempo-real.md) | [`Spec03TrafficTableTest.tsx`](./frontend/src/tests/Spec03TrafficTableTest.tsx) | Barra de control de captura, barra de filtros por protocolo/IP y tabla de tráfico en vivo con selección de fila. |
 | **Fase 4** | **Persona 2** | Frontend / OSI | [`/specs/04-inspector-visual-osi.md`](./specs/04-inspector-visual-osi.md) | [`Spec04OsiInspectorTest.tsx`](./frontend/src/tests/Spec04OsiInspectorTest.tsx) | Inspector visual interactivo del Modelo OSI con tarjetas desplegables por capa, glosario pedagógico y visor Hex/ASCII. |
+| **Fase 5** | **Lead UI/UX & Frontend** | **Frontend / UX Unificado** | [`/specs/05-rediseño-frontend-claro-unificado.md`](./specs/05-rediseño-frontend-claro-unificado.md) | [`Spec05UnifiedUiTest.tsx`](./frontend/src/tests/Spec05UnifiedUiTest.tsx) | Aplicación web unificada en tema claro (Clean Light UI), layout de 3 zonas en pantalla única, eliminación de ruido de tests SDD y acceso discreto a Laboratorio QA. |
 
 ---
 
@@ -220,7 +222,8 @@ export interface CapturedPacket {
 │   ├── 01-motor-captura-osi.md         # Especificación Fase 1 (Persona 1)
 │   ├── 02-api-flask-streaming.md       # Especificación Fase 2 (Persona 1)
 │   ├── 03-tabla-trafico-tiempo-real.md # Especificación Fase 3 (Persona 2)
-│   └── 04-inspector-visual-osi.md      # Especificación Fase 4 (Persona 2)
+│   ├── 04-inspector-visual-osi.md      # Especificación Fase 4 (Persona 2)
+│   └── 05-rediseño-frontend-claro-unificado.md # Especificación Fase 5 (UI/UX Unificado)
 ├── backend/                            # Reservado para motor Scapy + servidor Flask (Persona 1)
 └── frontend/
     └── src/
@@ -230,6 +233,7 @@ export interface CapturedPacket {
             ├── Spec02ApiStreamTest.tsx
             ├── Spec03TrafficTableTest.tsx
             ├── Spec04OsiInspectorTest.tsx
+            ├── Spec05UnifiedUiTest.tsx
             └── TestSuiteRunner.tsx
 ```
 

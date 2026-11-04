@@ -26,3 +26,21 @@ export type { OsiInspectorProps } from './OsiInspector';
 
 export { OSI_PEDAGOGICAL_GUIDES } from './osiPedagogicalGuides';
 export type { OsiLayerKey, OsiPedagogicalLayerGuide } from './osiPedagogicalGuides';
+
+export { AppHeader, QUICK_PROTOCOL_CHIPS } from './AppHeader';
+export type { AppHeaderProps, QuickProtocolFilter, QuickFilterChip } from './AppHeader';
+
+export {
+  LiveTrafficPanel,
+  getLightProtocolBadgeClasses,
+  translatePacketActivity,
+  formatEndpointAddress,
+  filterUnifiedPackets,
+} from './LiveTrafficPanel';
+export type { LiveTrafficPanelProps } from './LiveTrafficPanel';
+
+export { OsiInspectorPanel } from './OsiInspectorPanel';
+export type { OsiInspectorPanelProps } from './OsiInspectorPanel';
+
+export { UnifiedDashboard } from './UnifiedDashboard';
+export type { UnifiedDashboardProps } from './UnifiedDashboard';

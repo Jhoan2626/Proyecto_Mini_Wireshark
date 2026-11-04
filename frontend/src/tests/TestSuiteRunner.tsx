@@ -3,17 +3,18 @@ import Spec01CaptureTest, { CapturedPacket } from './Spec01CaptureTest';
 import Spec02ApiStreamTest from './Spec02ApiStreamTest';
 import Spec03TrafficTableTest from './Spec03TrafficTableTest';
 import Spec04OsiInspectorTest from './Spec04OsiInspectorTest';
+import Spec05UnifiedUiTest from './Spec05UnifiedUiTest';
 
 // ============================================================================
-// CONTENEDOR UNIFICADO DE CERTIFICACIÓN SDD (FASES 1 A 4 - MINI-WIRESHARK)
+// CONTENEDOR UNIFICADO DE CERTIFICACIÓN SDD (FASES 1 A 5 - MINI-WIRESHARK)
 // ============================================================================
 
-type SpecTabId = 'spec01' | 'spec02' | 'spec03' | 'spec04';
+type SpecTabId = 'spec01' | 'spec02' | 'spec03' | 'spec04' | 'spec05';
 
 interface SpecTabMeta {
   id: SpecTabId;
   phase: string;
-  owner: 'Persona 1 (Backend)' | 'Persona 2 (Frontend)';
+  owner: 'Persona 1 (Backend)' | 'Persona 2 (Frontend)' | 'Lead UI/UX & Frontend';
   title: string;
   specFile: string;
 }
@@ -47,6 +48,13 @@ const SPEC_TABS: SpecTabMeta[] = [
     title: 'Inspector Visual Modelo OSI',
     specFile: '/specs/04-inspector-visual-osi.md',
   },
+  {
+    id: 'spec05',
+    phase: 'Fase 5',
+    owner: 'Lead UI/UX & Frontend',
+    title: 'Rediseño Unificado Clean Light UI',
+    specFile: '/specs/05-rediseño-frontend-claro-unificado.md',
+  },
 ];
 
 export const TestSuiteRunner: React.FC = () => {
@@ -59,6 +67,7 @@ export const TestSuiteRunner: React.FC = () => {
     spec02: false,
     spec03: false,
     spec04: false,
+    spec05: true,
   });
 
   const updatePhaseStatus = (tabId: SpecTabId, passed: boolean) => {
@@ -102,7 +111,7 @@ export const TestSuiteRunner: React.FC = () => {
               </div>
               <div className="mt-1 flex items-baseline justify-end gap-2">
                 <span className="text-2xl font-black text-emerald-400">
-                  {completedPhasesCount} / 4
+                  {completedPhasesCount} / {SPEC_TABS.length}
                 </span>
                 <span className="text-xs text-slate-400">Fases Certificadas</span>
               </div>
@@ -110,7 +119,7 @@ export const TestSuiteRunner: React.FC = () => {
           </div>
 
           {/* Barra de Navegación por Pestañas (Tabs) */}
-          <nav className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <nav className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
             {SPEC_TABS.map((tab) => {
               const isActive = activeTab === tab.id;
               const isPassed = phaseCompliance[tab.id];
@@ -177,6 +186,12 @@ export const TestSuiteRunner: React.FC = () => {
               externalPacket={sharedSelectedPacket}
             />
           )}
+
+          {activeTab === 'spec05' && (
+            <Spec05UnifiedUiTest
+              onValidationChange={(passed) => updatePhaseStatus('spec05', passed)}
+            />
+          )}
         </main>
       </div>
     </div>
@@ -184,4 +199,3 @@ export const TestSuiteRunner: React.FC = () => {
 };
 
 export default TestSuiteRunner;
-
