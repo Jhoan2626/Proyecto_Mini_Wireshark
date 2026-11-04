@@ -1,15 +1,22 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import {
   CapturedPacket,
+  CaptureMode,
   PacketProtocol,
   FIXTURE_PACKETS,
 } from './Spec01CaptureTest';
+import {
+  CaptureControlBar,
+  TrafficFilterBar,
+  TrafficPacketTable,
+  filterPackets,
+} from '../components';
 
 // ============================================================================
 // GENERADOR DE FLUJO CONTROLADO DE PAQUETES PARA BANCO DE PRUEBAS (FASE 3)
 // ============================================================================
 
-const INITIAL_STREAM_PACKETS: CapturedPacket[] = [
+export const INITIAL_STREAM_PACKETS: CapturedPacket[] = [
   { ...FIXTURE_PACKETS.http_tcp, id: 1, relative_time: 0.012 },
   { ...FIXTURE_PACKETS.dns_udp, id: 2, relative_time: 0.145 },
   { ...FIXTURE_PACKETS.icmp_ping, id: 3, relative_time: 0.312 },
@@ -75,16 +82,6 @@ const INITIAL_STREAM_PACKETS: CapturedPacket[] = [
   },
 ];
 
-const PROTOCOL_FILTERS: Array<'ALL' | PacketProtocol> = [
-  'ALL',
-  'TCP',
-  'UDP',
-  'HTTP',
-  'DNS',
-  'ICMP',
-  'ARP',
-];
-
 export interface Spec03TrafficTableTestProps {
   onValidationChange?: (allPassed: boolean) => void;
   onPacketSelectedForInspection?: (packet: CapturedPacket) => void;
@@ -100,7 +97,9 @@ export const Spec03TrafficTableTest: React.FC<Spec03TrafficTableTestProps> = ({
   const [selectedPacket, setSelectedPacket] = useState<CapturedPacket | null>(
     INITIAL_STREAM_PACKETS[0]
   );
+  const [captureMode, setCaptureMode] = useState<CaptureMode>('mock');
   const [isStreamActive, setIsStreamActive] = useState<boolean>(false);
+  const [autoScroll, setAutoScroll] = useState<boolean>(false);
   const [lastRenderDurationMs, setLastRenderDurationMs] = useState<number>(1.4);
 
   // Registro de pruebas interactivas superadas en el arnés
@@ -124,26 +123,10 @@ export const Spec03TrafficTableTest: React.FC<Spec03TrafficTableTestProps> = ({
     onValidationChange?.(allChecksPassed);
   }, [allChecksPassed, onValidationChange]);
 
-  // Filtrado en tiempo real según Spec 03
+  // Filtrado en tiempo real según Spec 03 utilizando la función certificada del componente
   const filteredPackets = useMemo(() => {
     const t0 = performance.now();
-    const query = ipSearchQuery.trim().toLowerCase();
-
-    const result = packets.filter((pkt) => {
-      const matchesProtocol =
-        selectedProtocol === 'ALL' ||
-        pkt.summary.protocol === selectedProtocol ||
-        pkt.osi_layers.layer4_transport?.protocol === selectedProtocol;
-
-      const matchesIpOrInfo =
-        query === '' ||
-        pkt.summary.src_ip.toLowerCase().includes(query) ||
-        pkt.summary.dst_ip.toLowerCase().includes(query) ||
-        pkt.summary.info.toLowerCase().includes(query);
-
-      return matchesProtocol && matchesIpOrInfo;
-    });
-
+    const result = filterPackets(packets, selectedProtocol, ipSearchQuery);
     const elapsed = Number((performance.now() - t0).toFixed(2));
     setLastRenderDurationMs(elapsed);
     return result;
@@ -162,6 +145,7 @@ export const Spec03TrafficTableTest: React.FC<Spec03TrafficTableTestProps> = ({
         added.push({
           ...tpl,
           id: nextId,
+          captured_mode: captureMode,
           timestamp: new Date().toISOString(),
           relative_time: Number((nextId * 0.215).toFixed(3)),
         });
@@ -177,7 +161,7 @@ export const Spec03TrafficTableTest: React.FC<Spec03TrafficTableTestProps> = ({
       injectMockBurst(1);
     }, 850);
     return () => clearInterval(interval);
-  }, [isStreamActive]);
+  }, [isStreamActive, captureMode]);
 
   const handleProtocolClick = (proto: 'ALL' | PacketProtocol) => {
     setSelectedProtocol(proto);
@@ -193,29 +177,31 @@ export const Spec03TrafficTableTest: React.FC<Spec03TrafficTableTestProps> = ({
     }
   };
 
+  const handleResetFilters = () => {
+    setSelectedProtocol('ALL');
+    setIpSearchQuery('');
+  };
+
   const handleSelectRow = (pkt: CapturedPacket) => {
     setSelectedPacket(pkt);
     setChecks((prev) => ({ ...prev, rowSelectionTested: true }));
     onPacketSelectedForInspection?.(pkt);
   };
 
-  const protocolBadgeStyle = (proto: PacketProtocol) => {
-    switch (proto) {
-      case 'TCP':
-        return 'bg-indigo-500/20 text-indigo-300 border-indigo-500/40';
-      case 'UDP':
-      case 'DNS':
-        return 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40';
-      case 'HTTP':
-      case 'HTTPS':
-        return 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40';
-      case 'ICMP':
-        return 'bg-amber-500/20 text-amber-300 border-amber-500/40';
-      case 'ARP':
-        return 'bg-purple-500/20 text-purple-300 border-purple-500/40';
-      default:
-        return 'bg-slate-700 text-slate-300 border-slate-600';
-    }
+  const handleStartCapture = (mode: CaptureMode) => {
+    setCaptureMode(mode);
+    setIsStreamActive(true);
+    setChecks((prev) => ({ ...prev, streamInjectionTested: true }));
+  };
+
+  const handleStopCapture = () => {
+    setIsStreamActive(false);
+  };
+
+  const handleClearPackets = () => {
+    setIsStreamActive(false);
+    setPackets([]);
+    setSelectedPacket(null);
   };
 
   return (
@@ -255,7 +241,7 @@ export const Spec03TrafficTableTest: React.FC<Spec03TrafficTableTestProps> = ({
           </div>
         </div>
 
-        {/* Barra de Inyección de Tráfico de Prueba */}
+        {/* Barra de Inyección de Tráfico de Prueba (Arnés SDD) */}
         <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-slate-800 pt-4">
           <div className="flex flex-wrap items-center gap-2">
             <button
@@ -292,42 +278,40 @@ export const Spec03TrafficTableTest: React.FC<Spec03TrafficTableTestProps> = ({
                 setPackets(INITIAL_STREAM_PACKETS);
                 setSelectedProtocol('ALL');
                 setIpSearchQuery('');
+                setSelectedPacket(INITIAL_STREAM_PACKETS[0]);
               }}
               className="rounded-lg bg-rose-950/60 px-3 py-1.5 text-xs font-medium text-rose-300 hover:bg-rose-900/60 border border-rose-500/30"
             >
               Reiniciar Buffer
             </button>
           </div>
-
-          {/* Barra de Filtrado Rápido por Protocolo e IP */}
-          <div className="flex flex-wrap items-center gap-2">
-            <div className="flex items-center gap-1 rounded-lg bg-slate-950 p-1 border border-slate-800">
-              {PROTOCOL_FILTERS.map((proto) => (
-                <button
-                  key={proto}
-                  type="button"
-                  onClick={() => handleProtocolClick(proto)}
-                  className={`rounded px-2.5 py-1 text-xs font-mono font-semibold transition ${
-                    selectedProtocol === proto
-                      ? 'bg-blue-600 text-white'
-                      : 'text-slate-400 hover:text-white'
-                  }`}
-                >
-                  {proto}
-                </button>
-              ))}
-            </div>
-
-            <input
-              type="text"
-              value={ipSearchQuery}
-              onChange={(e) => handleIpFilterChange(e.target.value)}
-              placeholder="Filtrar IP o Info (ej. 8.8.8.8, ARP)..."
-              className="w-56 rounded-lg border border-slate-700 bg-slate-950 px-3 py-1.5 text-xs font-mono text-slate-200 focus:border-blue-500 focus:outline-none"
-            />
-          </div>
         </div>
       </div>
+
+      {/* Componente Oficial 2.1: Barra de Control de Captura (CaptureControlBar) */}
+      <CaptureControlBar
+        isCapturing={isStreamActive}
+        captureMode={captureMode}
+        onModeChange={setCaptureMode}
+        onStartCapture={handleStartCapture}
+        onStopCapture={handleStopCapture}
+        onClearPackets={handleClearPackets}
+        totalPackets={packets.length}
+        visiblePackets={filteredPackets.length}
+        autoScroll={autoScroll}
+        onToggleAutoScroll={() => setAutoScroll((prev) => !prev)}
+      />
+
+      {/* Componente Oficial 2.2: Barra de Filtrado Rápido (TrafficFilterBar) */}
+      <TrafficFilterBar
+        selectedProtocol={selectedProtocol}
+        onSelectProtocol={handleProtocolClick}
+        searchQuery={ipSearchQuery}
+        onSearchQueryChange={handleIpFilterChange}
+        onResetFilters={handleResetFilters}
+        visibleCount={filteredPackets.length}
+        totalCount={packets.length}
+      />
 
       {/* Estado de Criterios de Aceptación Spec 03 */}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-5">
@@ -354,68 +338,26 @@ export const Spec03TrafficTableTest: React.FC<Spec03TrafficTableTestProps> = ({
 
       {/* Tabla de Paquetes + Inspector de Evento onSelectPacket */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-        {/* Tabla de 7 Columnas */}
-        <div className="lg:col-span-8 overflow-hidden rounded-xl border border-slate-800 bg-slate-900/90">
-          <div className="max-h-96 overflow-y-auto">
-            <table className="w-full text-left border-collapse">
-              <thead className="sticky top-0 bg-slate-950 text-[11px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-800">
-                <tr>
-                  <th className="py-2.5 px-3">No.</th>
-                  <th className="py-2.5 px-3">Tiempo</th>
-                  <th className="py-2.5 px-3">IP Origen</th>
-                  <th className="py-2.5 px-3">IP Destino</th>
-                  <th className="py-2.5 px-3">Protocolo</th>
-                  <th className="py-2.5 px-3">Longitud</th>
-                  <th className="py-2.5 px-3">Info</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-800/70 font-mono text-xs">
-                {filteredPackets.length === 0 ? (
-                  <tr>
-                    <td colSpan={7} className="py-8 text-center text-slate-500">
-                      Ningún paquete coincide con el filtro actual ({selectedProtocol} / "
-                      {ipSearchQuery}").
-                    </td>
-                  </tr>
-                ) : (
-                  filteredPackets.map((pkt) => {
-                    const isSelected = selectedPacket?.id === pkt.id;
-                    return (
-                      <tr
-                        key={pkt.id}
-                        onClick={() => handleSelectRow(pkt)}
-                        className={`cursor-pointer transition ${
-                          isSelected
-                            ? 'bg-blue-600/25 text-white'
-                            : 'hover:bg-slate-800/60 text-slate-300'
-                        }`}
-                      >
-                        <td className="py-2 px-3 font-bold text-slate-400">{pkt.id}</td>
-                        <td className="py-2 px-3 text-slate-400">
-                          {pkt.relative_time?.toFixed(3) ?? '0.000'}s
-                        </td>
-                        <td className="py-2 px-3">{pkt.summary.src_ip}</td>
-                        <td className="py-2 px-3">{pkt.summary.dst_ip}</td>
-                        <td className="py-2 px-3">
-                          <span
-                            className={`inline-block rounded border px-2 py-0.5 text-[10px] font-bold ${protocolBadgeStyle(
-                              pkt.summary.protocol
-                            )}`}
-                          >
-                            {pkt.summary.protocol}
-                          </span>
-                        </td>
-                        <td className="py-2 px-3 text-slate-400">{pkt.summary.length} B</td>
-                        <td className="py-2 px-3 truncate max-w-xs text-slate-300">
-                          {pkt.summary.info}
-                        </td>
-                      </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
-          </div>
+        {/* Componente Oficial 2.3: Tabla de 7 Columnas (TrafficPacketTable) */}
+        <div className="lg:col-span-8">
+          <TrafficPacketTable
+            packets={packets}
+            selectedPacketId={selectedPacket?.id ?? null}
+            onSelectPacket={handleSelectRow}
+            isCapturing={isStreamActive}
+            captureMode={captureMode}
+            onStartCapture={handleStartCapture}
+            onStopCapture={handleStopCapture}
+            onClearPackets={handleClearPackets}
+            selectedProtocol={selectedProtocol}
+            onProtocolChange={handleProtocolClick}
+            searchQuery={ipSearchQuery}
+            onSearchQueryChange={handleIpFilterChange}
+            onCaptureModeChange={setCaptureMode}
+            showControlBar={false}
+            showFilterBar={false}
+            initialAutoScroll={autoScroll}
+          />
         </div>
 
         {/* Monitor del Evento onSelectPacket */}
@@ -455,4 +397,3 @@ export const Spec03TrafficTableTest: React.FC<Spec03TrafficTableTestProps> = ({
 };
 
 export default Spec03TrafficTableTest;
-
