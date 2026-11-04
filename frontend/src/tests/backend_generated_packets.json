@@ -1,0 +1,397 @@
+[
+  {
+    "id": 1,
+    "timestamp": "2026-11-01T04:57:23.426669+00:00",
+    "relative_time": 0.0,
+    "captured_mode": "mock",
+    "summary": {
+      "src_ip": "192.168.1.105",
+      "dst_ip": "93.184.216.34",
+      "protocol": "HTTP",
+      "length": 132,
+      "info": "51842 \u2192 80 [PSH, ACK] GET /index.html HTTP/1.1"
+    },
+    "osi_layers": {
+      "layer2_datalink": {
+        "protocol": "Ethernet II",
+        "src_mac": "00:1A:2B:3C:4D:5E",
+        "dst_mac": "AA:BB:CC:DD:EE:FF",
+        "ethertype": "0x0800",
+        "ethertype_name": "IPv4"
+      },
+      "layer3_network": {
+        "protocol": "IPv4",
+        "src_ip": "192.168.1.105",
+        "dst_ip": "93.184.216.34",
+        "ttl": 64,
+        "length": 132,
+        "protocol_id": 6
+      },
+      "layer4_transport": {
+        "protocol": "TCP",
+        "src_port": 51842,
+        "dst_port": 80,
+        "flags": "PSH, ACK",
+        "checksum": "0x7c21",
+        "seq_num": 1,
+        "ack_num": 1
+      },
+      "layer7_application": {
+        "protocol_hint": "HTTP",
+        "payload_size": 78,
+        "hex_dump": "47 45 54 20 2f 69 6e 64 65 78 2e 68 74 6d 6c 20 48 54 54 50 2f 31 2e 31 0d 0a 48 6f 73 74 3a 20 65 78 61 6d 70 6c 65 2e 63 6f 6d 0d 0a 55 73 65 72 2d 41 67 65 6e 74 3a 20 4d 69 6e 69 57 69 72 65 73 68 61 72 6b 2f 31 2e 30 0d 0a 0d 0a",
+        "ascii_preview": "GET /index.html HTTP/1.1..Host: example.com..User-Agent: MiniWireshark/1.0...."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "timestamp": "2026-11-01T04:57:23.426782+00:00",
+    "relative_time": 0.0,
+    "captured_mode": "mock",
+    "summary": {
+      "src_ip": "192.168.1.105",
+      "dst_ip": "142.250.190.46",
+      "protocol": "HTTPS",
+      "length": 64,
+      "info": "53120 \u2192 443 [SYN] Seq=0 Win=64240 Len=0"
+    },
+    "osi_layers": {
+      "layer2_datalink": {
+        "protocol": "Ethernet II",
+        "src_mac": "00:1A:2B:3C:4D:5E",
+        "dst_mac": "AA:BB:CC:DD:EE:FF",
+        "ethertype": "0x0800",
+        "ethertype_name": "IPv4"
+      },
+      "layer3_network": {
+        "protocol": "IPv4",
+        "src_ip": "192.168.1.105",
+        "dst_ip": "142.250.190.46",
+        "ttl": 128,
+        "length": 64,
+        "protocol_id": 6
+      },
+      "layer4_transport": {
+        "protocol": "TCP",
+        "src_port": 53120,
+        "dst_port": 443,
+        "flags": "SYN",
+        "checksum": "0xa1b2",
+        "seq_num": 0,
+        "ack_num": 0
+      },
+      "layer7_application": {
+        "protocol_hint": "HTTPS/TLS",
+        "payload_size": 0,
+        "hex_dump": "",
+        "ascii_preview": ""
+      }
+    }
+  },
+  {
+    "id": 3,
+    "timestamp": "2026-11-01T04:57:23.426804+00:00",
+    "relative_time": 0.0,
+    "captured_mode": "mock",
+    "summary": {
+      "src_ip": "192.168.1.105",
+      "dst_ip": "8.8.8.8",
+      "protocol": "DNS",
+      "length": 75,
+      "info": "Standard query 0x1a2b A universidad.edu"
+    },
+    "osi_layers": {
+      "layer2_datalink": {
+        "protocol": "Ethernet II",
+        "src_mac": "00:1A:2B:3C:4D:5E",
+        "dst_mac": "AA:BB:CC:DD:EE:FF",
+        "ethertype": "0x0800",
+        "ethertype_name": "IPv4"
+      },
+      "layer3_network": {
+        "protocol": "IPv4",
+        "src_ip": "192.168.1.105",
+        "dst_ip": "8.8.8.8",
+        "ttl": 64,
+        "length": 75,
+        "protocol_id": 17
+      },
+      "layer4_transport": {
+        "protocol": "UDP",
+        "src_port": 54321,
+        "dst_port": 53,
+        "flags": null,
+        "checksum": "0x3f1a"
+      },
+      "layer7_application": {
+        "protocol_hint": "DNS",
+        "payload_size": 33,
+        "hex_dump": "1a 2b 01 00 00 01 00 00 00 00 00 00 0f 75 6e 69 76 65 72 73 69 64 61 64 03 65 64 75 00 00 01 00 01",
+        "ascii_preview": ".+...........universidad.edu....."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "timestamp": "2026-11-01T04:57:23.426838+00:00",
+    "relative_time": 0.0,
+    "captured_mode": "mock",
+    "summary": {
+      "src_ip": "192.168.1.105",
+      "dst_ip": "1.1.1.1",
+      "protocol": "ICMP",
+      "length": 74,
+      "info": "Echo (ping) request id=0x0042, seq=1/256, ttl=64"
+    },
+    "osi_layers": {
+      "layer2_datalink": {
+        "protocol": "Ethernet II",
+        "src_mac": "00:1A:2B:3C:4D:5E",
+        "dst_mac": "AA:BB:CC:DD:EE:FF",
+        "ethertype": "0x0800",
+        "ethertype_name": "IPv4"
+      },
+      "layer3_network": {
+        "protocol": "IPv4",
+        "src_ip": "192.168.1.105",
+        "dst_ip": "1.1.1.1",
+        "ttl": 64,
+        "length": 74,
+        "protocol_id": 1
+      },
+      "layer4_transport": {
+        "protocol": "ICMP",
+        "src_port": null,
+        "dst_port": null,
+        "flags": "Echo Request (Type 8, Code 0)",
+        "checksum": "0x4d5a"
+      },
+      "layer7_application": {
+        "protocol_hint": "ICMP Data",
+        "payload_size": 32,
+        "hex_dump": "61 62 63 64 65 66 67 68 69 6a 6b 6c 6d 6e 6f 70 71 72 73 74 75 76 77 61 62 63 64 65 66 67 68 69",
+        "ascii_preview": "abcdefghijklmnopqrstuvwabcdefghi"
+      }
+    }
+  },
+  {
+    "id": 5,
+    "timestamp": "2026-11-01T04:57:23.426878+00:00",
+    "relative_time": 0.0,
+    "captured_mode": "mock",
+    "summary": {
+      "src_ip": "192.168.1.105",
+      "dst_ip": "192.168.1.1",
+      "protocol": "ARP",
+      "length": 42,
+      "info": "Who has 192.168.1.1? Tell 192.168.1.105"
+    },
+    "osi_layers": {
+      "layer2_datalink": {
+        "protocol": "Ethernet II",
+        "src_mac": "00:1A:2B:3C:4D:5E",
+        "dst_mac": "FF:FF:FF:FF:FF:FF",
+        "ethertype": "0x0806",
+        "ethertype_name": "ARP"
+      },
+      "layer3_network": {
+        "protocol": "ARP",
+        "src_ip": "192.168.1.105",
+        "dst_ip": "192.168.1.1",
+        "ttl": null,
+        "length": 42,
+        "protocol_id": null
+      },
+      "layer4_transport": {
+        "protocol": "NONE",
+        "src_port": null,
+        "dst_port": null,
+        "flags": null,
+        "checksum": null
+      },
+      "layer7_application": {
+        "protocol_hint": "ARP Payload",
+        "payload_size": 0,
+        "hex_dump": "",
+        "ascii_preview": ""
+      }
+    }
+  },
+  {
+    "id": 6,
+    "timestamp": "2026-11-01T04:57:23.426889+00:00",
+    "relative_time": 0.0,
+    "captured_mode": "mock",
+    "summary": {
+      "src_ip": "192.168.1.105",
+      "dst_ip": "93.184.216.34",
+      "protocol": "HTTP",
+      "length": 132,
+      "info": "51842 \u2192 80 [PSH, ACK] GET /index.html HTTP/1.1"
+    },
+    "osi_layers": {
+      "layer2_datalink": {
+        "protocol": "Ethernet II",
+        "src_mac": "00:1A:2B:3C:4D:5E",
+        "dst_mac": "AA:BB:CC:DD:EE:FF",
+        "ethertype": "0x0800",
+        "ethertype_name": "IPv4"
+      },
+      "layer3_network": {
+        "protocol": "IPv4",
+        "src_ip": "192.168.1.105",
+        "dst_ip": "93.184.216.34",
+        "ttl": 64,
+        "length": 132,
+        "protocol_id": 6
+      },
+      "layer4_transport": {
+        "protocol": "TCP",
+        "src_port": 51842,
+        "dst_port": 80,
+        "flags": "PSH, ACK",
+        "checksum": "0x7c21",
+        "seq_num": 1,
+        "ack_num": 1
+      },
+      "layer7_application": {
+        "protocol_hint": "HTTP",
+        "payload_size": 78,
+        "hex_dump": "47 45 54 20 2f 69 6e 64 65 78 2e 68 74 6d 6c 20 48 54 54 50 2f 31 2e 31 0d 0a 48 6f 73 74 3a 20 65 78 61 6d 70 6c 65 2e 63 6f 6d 0d 0a 55 73 65 72 2d 41 67 65 6e 74 3a 20 4d 69 6e 69 57 69 72 65 73 68 61 72 6b 2f 31 2e 30 0d 0a 0d 0a",
+        "ascii_preview": "GET /index.html HTTP/1.1..Host: example.com..User-Agent: MiniWireshark/1.0...."
+      }
+    }
+  },
+  {
+    "id": 7,
+    "timestamp": "2026-11-01T04:57:23.426945+00:00",
+    "relative_time": 0.0,
+    "captured_mode": "mock",
+    "summary": {
+      "src_ip": "192.168.1.105",
+      "dst_ip": "142.250.190.46",
+      "protocol": "HTTPS",
+      "length": 64,
+      "info": "53120 \u2192 443 [SYN] Seq=0 Win=64240 Len=0"
+    },
+    "osi_layers": {
+      "layer2_datalink": {
+        "protocol": "Ethernet II",
+        "src_mac": "00:1A:2B:3C:4D:5E",
+        "dst_mac": "AA:BB:CC:DD:EE:FF",
+        "ethertype": "0x0800",
+        "ethertype_name": "IPv4"
+      },
+      "layer3_network": {
+        "protocol": "IPv4",
+        "src_ip": "192.168.1.105",
+        "dst_ip": "142.250.190.46",
+        "ttl": 128,
+        "length": 64,
+        "protocol_id": 6
+      },
+      "layer4_transport": {
+        "protocol": "TCP",
+        "src_port": 53120,
+        "dst_port": 443,
+        "flags": "SYN",
+        "checksum": "0xa1b2",
+        "seq_num": 0,
+        "ack_num": 0
+      },
+      "layer7_application": {
+        "protocol_hint": "HTTPS/TLS",
+        "payload_size": 0,
+        "hex_dump": "",
+        "ascii_preview": ""
+      }
+    }
+  },
+  {
+    "id": 8,
+    "timestamp": "2026-11-01T04:57:23.426953+00:00",
+    "relative_time": 0.0,
+    "captured_mode": "mock",
+    "summary": {
+      "src_ip": "192.168.1.105",
+      "dst_ip": "8.8.8.8",
+      "protocol": "DNS",
+      "length": 75,
+      "info": "Standard query 0x1a2b A universidad.edu"
+    },
+    "osi_layers": {
+      "layer2_datalink": {
+        "protocol": "Ethernet II",
+        "src_mac": "00:1A:2B:3C:4D:5E",
+        "dst_mac": "AA:BB:CC:DD:EE:FF",
+        "ethertype": "0x0800",
+        "ethertype_name": "IPv4"
+      },
+      "layer3_network": {
+        "protocol": "IPv4",
+        "src_ip": "192.168.1.105",
+        "dst_ip": "8.8.8.8",
+        "ttl": 64,
+        "length": 75,
+        "protocol_id": 17
+      },
+      "layer4_transport": {
+        "protocol": "UDP",
+        "src_port": 54321,
+        "dst_port": 53,
+        "flags": null,
+        "checksum": "0x3f1a"
+      },
+      "layer7_application": {
+        "protocol_hint": "DNS",
+        "payload_size": 33,
+        "hex_dump": "1a 2b 01 00 00 01 00 00 00 00 00 00 0f 75 6e 69 76 65 72 73 69 64 61 64 03 65 64 75 00 00 01 00 01",
+        "ascii_preview": ".+...........universidad.edu....."
+      }
+    }
+  },
+  {
+    "id": 9,
+    "timestamp": "2026-11-01T04:57:23.426983+00:00",
+    "relative_time": 0.0,
+    "captured_mode": "mock",
+    "summary": {
+      "src_ip": "192.168.1.105",
+      "dst_ip": "1.1.1.1",
+      "protocol": "ICMP",
+      "length": 74,
+      "info": "Echo (ping) request id=0x0042, seq=1/256, ttl=64"
+    },
+    "osi_layers": {
+      "layer2_datalink": {
+        "protocol": "Ethernet II",
+        "src_mac": "00:1A:2B:3C:4D:5E",
+        "dst_mac": "AA:BB:CC:DD:EE:FF",
+        "ethertype": "0x0800",
+        "ethertype_name": "IPv4"
+      },
+      "layer3_network": {
+        "protocol": "IPv4",
+        "src_ip": "192.168.1.105",
+        "dst_ip": "1.1.1.1",
+        "ttl": 64,
+        "length": 74,
+        "protocol_id": 1
+      },
+      "layer4_transport": {
+        "protocol": "ICMP",
+        "src_port": null,
+        "dst_port": null,
+        "flags": "Echo Request (Type 8, Code 0)",
+        "checksum": "0x4d5a"
+      },
+      "layer7_application": {
+        "protocol_hint": "ICMP Data",
+        "payload_size": 32,
+        "hex_dump": "61 62 63 64 65 66 67 68 69 6a 6b 6c 6d 6e 6f 70 71 72 73 74 75 76 77 61 62 63 64 65 66 67 68 69",
+        "ascii_preview": "abcdefghijklmnopqrstuvwabcdefghi"
+      }
+    }
+  }
+]
