@@ -1,5 +1,5 @@
 import React from 'react';
-import { CaptureMode, PacketProtocol } from '../tests/Spec01CaptureTest';
+import { CaptureMode, NetworkInterfaceItem, PacketProtocol } from '../tests/Spec01CaptureTest';
 
 export type QuickProtocolFilter = 'ALL' | PacketProtocol;
 
@@ -18,6 +18,8 @@ export const QUICK_PROTOCOL_CHIPS: QuickFilterChip[] = [
   { id: 'ARP', label: 'Red Local (ARP)' },
 ];
 
+export const QUICK_PORT_FILTERS = ['8000', '80', '443', '8080'];
+
 export interface AppHeaderProps {
   isCapturing: boolean;
   captureMode: CaptureMode;
@@ -29,6 +31,9 @@ export interface AppHeaderProps {
   onSelectProtocol: (protocol: QuickProtocolFilter) => void;
   searchQuery: string;
   onSearchQueryChange: (query: string) => void;
+  interfaces?: NetworkInterfaceItem[];
+  selectedInterface?: string;
+  onSelectInterface?: (ifaceId: string) => void;
   onOpenQaLab?: () => void;
   isQaLabOpen?: boolean;
 }
@@ -44,6 +49,9 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   onSelectProtocol,
   searchQuery,
   onSearchQueryChange,
+  interfaces = [],
+  selectedInterface = '',
+  onSelectInterface,
   onOpenQaLab,
   isQaLabOpen = false,
 }) => {
@@ -140,6 +148,29 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
             </button>
           </div>
 
+          {/* Selector de Interfaz de Red Real (visible cuando está activo "Red Local (Scapy)") */}
+          {captureMode === 'real' && (
+            <div className="flex items-center gap-1.5">
+              <select
+                aria-label="Seleccionar interfaz de red real"
+                data-testid="network-interface-select"
+                value={selectedInterface}
+                onChange={(e) => onSelectInterface?.(e.target.value)}
+                className="bg-slate-50 hover:bg-white focus:bg-white border border-slate-200 focus:border-blue-500 focus:outline-none rounded-lg text-xs font-medium text-slate-700 px-2.5 py-1.5 max-w-64 truncate transition-colors"
+              >
+                {interfaces.length === 0 ? (
+                  <option value="">Interfaz Activa (Auto-detectar Wi-Fi / Ethernet)</option>
+                ) : (
+                  interfaces.map((iface) => (
+                    <option key={iface.id} value={iface.id}>
+                      {iface.label}
+                    </option>
+                  ))
+                )}
+              </select>
+            </div>
+          )}
+
           {/* Botón Primario de Acción (Iniciar / Pausar) */}
           {!isCapturing ? (
             <button
@@ -219,39 +250,69 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
         </div>
       </div>
 
-      {/* Subheader Integrado: Barra de Filtrado Intuitiva por Protocolo y Buscador Universal */}
+      {/* Subheader Integrado: Barra de Filtrado Intuitiva por Protocolo, Puertos y Buscador de Payload */}
       <div className="bg-slate-50/80 border-t border-slate-200 px-6 py-2 flex flex-wrap items-center justify-between gap-3">
-        {/* Píldoras de Filtro Rápido por Protocolo */}
-        <div
-          className="flex flex-wrap items-center gap-1.5"
-          role="group"
-          aria-label="Filtros rápidos por protocolo"
-        >
-          <span className="text-slate-500 text-xs font-medium mr-1">
-            Protocolos:
-          </span>
-          {QUICK_PROTOCOL_CHIPS.map((chip) => {
-            const isActive = selectedProtocol === chip.id;
-            return (
-              <button
-                key={chip.id}
-                type="button"
-                onClick={() => onSelectProtocol(chip.id)}
-                aria-pressed={isActive}
-                data-testid={`unified-filter-chip-${chip.id}`}
-                className={`px-2.5 py-1 rounded-lg text-xs font-medium border transition-colors ${
-                  isActive
-                    ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
-                    : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100 hover:text-slate-900'
-                }`}
-              >
-                {chip.label}
-              </button>
-            );
-          })}
+        {/* Píldoras de Filtro Rápido por Protocolo y Puertos Frecuentes */}
+        <div className="flex flex-wrap items-center gap-3">
+          <div
+            className="flex flex-wrap items-center gap-1.5"
+            role="group"
+            aria-label="Filtros rápidos por protocolo"
+          >
+            <span className="text-slate-500 text-xs font-medium mr-1">
+              Protocolos:
+            </span>
+            {QUICK_PROTOCOL_CHIPS.map((chip) => {
+              const isActive = selectedProtocol === chip.id;
+              return (
+                <button
+                  key={chip.id}
+                  type="button"
+                  onClick={() => onSelectProtocol(chip.id)}
+                  aria-pressed={isActive}
+                  data-testid={`unified-filter-chip-${chip.id}`}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-medium border transition-colors ${
+                    isActive
+                      ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
+                      : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100 hover:text-slate-900'
+                  }`}
+                >
+                  {chip.label}
+                </button>
+              );
+            })}
+          </div>
+
+          <div
+            className="hidden xl:flex items-center gap-1 pl-3 border-l border-slate-200"
+            role="group"
+            aria-label="Filtros rápidos por puerto"
+          >
+            <span className="text-slate-500 text-xs font-medium mr-0.5">
+              Puerto:
+            </span>
+            {QUICK_PORT_FILTERS.map((port) => {
+              const isPortActive = searchQuery.trim() === port || searchQuery.trim() === `:${port}`;
+              return (
+                <button
+                  key={port}
+                  type="button"
+                  onClick={() => onSearchQueryChange(isPortActive ? '' : port)}
+                  data-testid={`quick-port-chip-${port}`}
+                  className={`px-2 py-0.5 rounded-md font-mono text-xs border transition-colors ${
+                    isPortActive
+                      ? 'bg-blue-50 text-blue-700 border-blue-300 font-semibold'
+                      : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100'
+                  }`}
+                >
+                  :{port}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
-        {/* Buscador Universal en Tiempo Real */}
+        {/* Buscador Universal en Tiempo Real (IP, Puerto, Nombre de Documento o Contenido de Payload) */}
         <div className="flex items-center gap-2">
           <div className="relative">
             <svg
@@ -271,10 +332,10 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
               type="text"
               value={searchQuery}
               onChange={(e) => onSearchQueryChange(e.target.value)}
-              placeholder="Buscar por IP, puerto, protocolo o actividad..."
-              aria-label="Buscar por IP, puerto, protocolo o actividad"
+              placeholder="Buscar por IP, puerto (8000) o texto en payload..."
+              aria-label="Buscar por IP, puerto, protocolo o texto en payload"
               data-testid="unified-search-input"
-              className="bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-500 focus:outline-none rounded-lg text-xs text-slate-800 placeholder:text-slate-400 pl-8 pr-3 py-1.5 w-64 transition-colors"
+              className="bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-500 focus:outline-none rounded-lg text-xs text-slate-800 placeholder:text-slate-400 pl-8 pr-3 py-1.5 w-72 transition-colors"
             />
           </div>
           {(selectedProtocol !== 'ALL' || searchQuery.trim() !== '') && (
@@ -297,4 +358,3 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
 };
 
 export default AppHeader;
-

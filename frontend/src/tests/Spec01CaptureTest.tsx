@@ -39,6 +39,18 @@ export interface OsiLayer7Application {
   payload_size: number;
   hex_dump: string;
   ascii_preview: string;
+  readable_text?: string;
+}
+
+export interface NetworkInterfaceItem {
+  id: string;
+  name: string;
+  description: string;
+  ip: string;
+  mac: string;
+  is_default: boolean;
+  is_loopback: boolean;
+  label: string;
 }
 
 export interface PacketSummary {

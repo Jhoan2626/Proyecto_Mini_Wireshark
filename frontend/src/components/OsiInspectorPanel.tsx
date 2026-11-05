@@ -388,7 +388,7 @@ export const OsiInspectorPanel: React.FC<OsiInspectorPanelProps> = ({ packet }) 
             DNS o datos cifrados) que recibe o envía directamente el software del usuario.
           </p>
 
-          {/* Acordeón Desplegable de Datos Crudos (Colapsado por defecto) */}
+          {/* Vista Legible de Texto / Contenido del Paquete + Acordeón de Datos Crudos */}
           {l7.payload_size === 0 ? (
             <div
               data-testid="unified-empty-payload-notice"
@@ -397,49 +397,69 @@ export const OsiInspectorPanel: React.FC<OsiInspectorPanelProps> = ({ packet }) 
               Paquete de control y señalización: no contiene datos de usuario en Capa 7
             </div>
           ) : (
-            <div className="border border-slate-200 rounded-lg overflow-hidden">
-              <button
-                type="button"
-                onClick={() => setIsRawPayloadExpanded((prev) => !prev)}
-                aria-expanded={isRawPayloadExpanded}
-                data-testid="unified-raw-payload-toggle"
-                className="w-full bg-slate-50 hover:bg-slate-100/80 px-3 py-2 flex items-center justify-between text-xs font-medium text-slate-700 transition-colors"
-              >
-                <span>Ver datos crudos (Hexadecimal / ASCII)</span>
-                <span className="font-mono text-slate-500">
-                  {isRawPayloadExpanded ? '▲ Ocultar' : '▼ Expandir'}
-                </span>
-              </button>
-
-              {isRawPayloadExpanded && (
-                <div
-                  data-testid="unified-raw-payload-content"
-                  className="p-3 bg-white border-t border-slate-200 grid grid-cols-1 sm:grid-cols-2 gap-2.5"
-                >
-                  <div>
-                    <div className="text-slate-500 text-xs font-medium mb-1">
-                      Hexadecimal
-                    </div>
-                    <div
-                      data-testid="unified-hex-dump"
-                      className="font-mono text-xs text-slate-800 bg-slate-100/80 p-3 rounded-lg border border-slate-200 break-words leading-relaxed"
-                    >
-                      {l7.hex_dump}
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-slate-500 text-xs font-medium mb-1">
-                      ASCII Imprimible
-                    </div>
-                    <div
-                      data-testid="unified-ascii-preview"
-                      className="font-mono text-xs text-slate-800 bg-slate-100/80 p-3 rounded-lg border border-slate-200 break-all leading-relaxed"
-                    >
-                      {l7.ascii_preview}
-                    </div>
-                  </div>
+            <div className="space-y-2.5">
+              {/* Vista directa del contenido legible (ASCII / UTF-8 con saltos de línea preservados) */}
+              <div className="bg-slate-50 rounded-lg p-2.5 border border-slate-200/80">
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-slate-600 text-xs font-medium">
+                    Contenido Legible del Payload (Texto / Cabeceras)
+                  </span>
+                  <span className="font-mono text-[11px] text-purple-700 bg-purple-50 px-1.5 py-0.5 rounded border border-purple-200">
+                    UTF-8 / ASCII
+                  </span>
                 </div>
-              )}
+                <pre
+                  data-testid="unified-readable-payload-preview"
+                  className="font-mono text-xs text-slate-800 bg-white p-2.5 rounded border border-slate-200 whitespace-pre-wrap break-words max-h-56 overflow-y-auto leading-relaxed"
+                >
+                  {l7.readable_text || l7.ascii_preview}
+                </pre>
+              </div>
+
+              <div className="border border-slate-200 rounded-lg overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => setIsRawPayloadExpanded((prev) => !prev)}
+                  aria-expanded={isRawPayloadExpanded}
+                  data-testid="unified-raw-payload-toggle"
+                  className="w-full bg-slate-50 hover:bg-slate-100/80 px-3 py-2 flex items-center justify-between text-xs font-medium text-slate-700 transition-colors"
+                >
+                  <span>Ver datos crudos (Hexadecimal / ASCII)</span>
+                  <span className="font-mono text-slate-500">
+                    {isRawPayloadExpanded ? '▲ Ocultar' : '▼ Expandir'}
+                  </span>
+                </button>
+
+                {isRawPayloadExpanded && (
+                  <div
+                    data-testid="unified-raw-payload-content"
+                    className="p-3 bg-white border-t border-slate-200 grid grid-cols-1 sm:grid-cols-2 gap-2.5"
+                  >
+                    <div>
+                      <div className="text-slate-500 text-xs font-medium mb-1">
+                        Hexadecimal
+                      </div>
+                      <div
+                        data-testid="unified-hex-dump"
+                        className="font-mono text-xs text-slate-800 bg-slate-100/80 p-3 rounded-lg border border-slate-200 break-words leading-relaxed max-h-64 overflow-y-auto"
+                      >
+                        {l7.hex_dump}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-slate-500 text-xs font-medium mb-1">
+                        ASCII Imprimible
+                      </div>
+                      <div
+                        data-testid="unified-ascii-preview"
+                        className="font-mono text-xs text-slate-800 bg-slate-100/80 p-3 rounded-lg border border-slate-200 break-all leading-relaxed max-h-64 overflow-y-auto"
+                      >
+                        {l7.ascii_preview}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </article>

@@ -6,6 +6,7 @@ import {
   UnifiedDashboard,
   getLightProtocolBadgeClasses,
   translatePacketActivity,
+  filterUnifiedPackets,
 } from '../components';
 import { Spec05UnifiedUiTest } from './Spec05UnifiedUiTest';
 import { FIXTURE_PACKETS } from './Spec01CaptureTest';
@@ -225,5 +226,50 @@ describe('Spec 05 — Rediseño Frontend Unificado y Tema Claro Profesional (/sp
     );
     expect(passed).toBe(true);
     expect(screen.getAllByText('✓ VERIFICADO').length).toBe(6);
+  });
+
+  it('8. [Modo Red Local (Scapy), Selector de Interfaz Real y Filtro de Payload/Puerto]: muestra selector de interfaz en modo real, no simula paquetes falsos y filtra por puerto 8000 o contenido del payload', () => {
+    render(<UnifiedDashboard />);
+
+    // Al cambiar a modo Red Local (Scapy), aparece el selector de interfaz de red real y se limpian los mocks
+    fireEvent.click(screen.getByTestId('mode-real-btn'));
+    expect(screen.getByTestId('network-interface-select')).toBeInTheDocument();
+    expect(screen.getByTestId('unified-packet-counter')).toHaveTextContent(
+      'Mostrando 0 de 0 paquetes capturados'
+    );
+
+    // Verificar que filterUnifiedPackets filtra por puerto (ej. 8000) y por texto dentro del payload de Capa 7
+    const realFilePacket = {
+      ...FIXTURE_PACKETS.http_tcp,
+      id: 901,
+      captured_mode: 'real' as const,
+      osi_layers: {
+        ...FIXTURE_PACKETS.http_tcp.osi_layers,
+        layer4_transport: {
+          ...FIXTURE_PACKETS.http_tcp.osi_layers.layer4_transport!,
+          src_port: 8000,
+          dst_port: 54120,
+        },
+        layer7_application: {
+          protocol_hint: 'HTTP',
+          payload_size: 85,
+          hex_dump: '55 4e 49 56 45 52 53 49 44 41 44',
+          ascii_preview: 'HTTP/1.0 200 OK Content-type: text/plain Informe_Final_Redes_Universidad.txt',
+          readable_text: 'HTTP/1.0 200 OK\nContent-type: text/plain\n\nInforme_Final_Redes_Universidad.txt',
+        },
+      },
+    };
+
+    const byPort = filterUnifiedPackets([realFilePacket, FIXTURE_PACKETS.dns_udp], 'ALL', '8000');
+    expect(byPort.length).toBe(1);
+    expect(byPort[0].id).toBe(901);
+
+    const byPayloadKeyword = filterUnifiedPackets(
+      [realFilePacket, FIXTURE_PACKETS.dns_udp],
+      'ALL',
+      'Informe_Final_Redes'
+    );
+    expect(byPayloadKeyword.length).toBe(1);
+    expect(byPayloadKeyword[0].id).toBe(901);
   });
 });

@@ -51,15 +51,47 @@ export function translatePacketActivity(packet: CapturedPacket): string {
         l7?.ascii_preview?.match(/(GET|POST|PUT|DELETE|HEAD)\s+([^\s]+)/) ||
         info.match(/(GET|POST|PUT|DELETE|HEAD)\s+([^\s]+)/);
       if (methodMatch) {
-        return `Petición de página web (${methodMatch[1]} ${methodMatch[2]})`;
+        let decodedPath = methodMatch[2];
+        try {
+          decodedPath = decodeURIComponent(methodMatch[2]);
+        } catch {
+          // Mantener ruta original si no es URI válido
+        }
+        return `Petición de página web (${methodMatch[1]} ${decodedPath})`;
+      }
+      const statusMatch =
+        l7?.ascii_preview?.match(/^(HTTP\/[12](?:\.\d)?\s+\d{3}\s+[A-Za-z0-9 ]+)/) ||
+        info.match(/(HTTP\/[12](?:\.\d)?\s+\d{3}\s+[A-Za-z0-9 ]+)/);
+      if (statusMatch) {
+        const rawText = l7?.readable_text || l7?.ascii_preview || '';
+        const fileMatch = rawText.match(/X-Requested-File:\s*([^\r\n]+)/i);
+        let fileLabel = '';
+        if (fileMatch) {
+          try {
+            fileLabel = ` · ${decodeURIComponent(fileMatch[1].trim())}`;
+          } catch {
+            fileLabel = ` · ${fileMatch[1].trim()}`;
+          }
+        }
+        const ctMatch = rawText.match(/Content-type:\s*([^\s;\r\n]+)/i);
+        const mimeInfo = ctMatch ? ` · ${ctMatch[1]}` : '';
+        return `Respuesta web (${statusMatch[1].trim()}${fileLabel}${mimeInfo} · ${l7?.payload_size ?? 0} bytes)`;
       }
       if (proto === 'HTTPS') {
         return 'Comunicación web cifrada segura (HTTPS / TLS)';
+      }
+      if (l7 && l7.payload_size > 0 && l7.ascii_preview) {
+        const snippet = l7.ascii_preview.trim().slice(0, 52);
+        return `Transferencia de datos HTTP (${l7.payload_size} bytes): "${snippet}"`;
       }
       return 'Petición de página web (HTTP)';
     }
     case 'TCP': {
       const flags = l4?.flags || 'SYN/ACK';
+      if (l7 && l7.payload_size > 0 && l7.ascii_preview) {
+        const snippet = l7.ascii_preview.trim().slice(0, 48);
+        return `Datos TCP (${l7.payload_size} bytes · ${flags}): "${snippet}"`;
+      }
       return `Conexión Web Segura / Establecimiento de Canal (${flags})`;
     }
     case 'ICMP': {
@@ -117,17 +149,36 @@ export function filterUnifiedPackets(
     if (!matchesProtocol) return false;
     if (q === '') return true;
 
+    const l2 = pkt.osi_layers.layer2_datalink;
     const l4 = pkt.osi_layers.layer4_transport;
+    const l7 = pkt.osi_layers.layer7_application;
     const srcEndpoint = formatEndpointAddress(pkt.summary.src_ip, l4?.src_port).toLowerCase();
     const dstEndpoint = formatEndpointAddress(pkt.summary.dst_ip, l4?.dst_port).toLowerCase();
     const activity = translatePacketActivity(pkt).toLowerCase();
 
+    // Coincidencia directa por número de puerto (ej. "8000" o ":8000")
+    const cleanPortQuery = q.startsWith(':') ? q.slice(1) : q;
+    const isPortMatch =
+      /^\d+$/.test(cleanPortQuery) &&
+      (String(l4?.src_port ?? '') === cleanPortQuery ||
+        String(l4?.dst_port ?? '') === cleanPortQuery);
+
+    const payloadAscii = (l7?.ascii_preview || '').toLowerCase();
+    const payloadReadable = (l7?.readable_text || '').toLowerCase();
+    const payloadHex = (l7?.hex_dump || '').toLowerCase();
+    const macAddresses = `${l2?.src_mac || ''} ${l2?.dst_mac || ''}`.toLowerCase();
+
     return (
+      isPortMatch ||
       srcEndpoint.includes(q) ||
       dstEndpoint.includes(q) ||
       pkt.summary.protocol.toLowerCase().includes(q) ||
       pkt.summary.info.toLowerCase().includes(q) ||
-      activity.includes(q)
+      activity.includes(q) ||
+      payloadAscii.includes(q) ||
+      payloadReadable.includes(q) ||
+      payloadHex.includes(q) ||
+      macAddresses.includes(q)
     );
   });
 }
