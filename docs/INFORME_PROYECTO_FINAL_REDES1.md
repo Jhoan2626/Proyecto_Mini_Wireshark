@@ -675,7 +675,8 @@ flowchart LR
 > [!WARNING]
 > Si el cliente es el **mismo PC** que ejecuta el servidor y Npcap Loopback no está disponible, el intercambio se registra mediante los Taps HTTP (§3.2.4): el payload es real, pero la MAC y el TTL son reconstruidos. Para evidenciar MAC y TTL reales, use un cliente distinto en la LAN, como indica el procedimiento.
 
-*Figura 1: `[Insertar captura del Inspector OSI — Escenario A]`*
+![Captura del Inspector OSI — Escenario A](Escenario%20A.png)
+*Figura 1: Captura del Inspector OSI — Escenario A (Tráfico HTTP con documento en texto plano e inspección multicapa)*
 
 ---
 
@@ -715,7 +716,8 @@ flowchart LR
 > [!NOTE]
 > **Hallazgo de la PoC (mejora pendiente).** La columna "Actividad en la Red" busca el dominio en `summary.info`, pero para UDP el backend genera `info = "53111 → 53 Len=32"` sin el nombre. En consecuencia, `translatePacketActivity()` usa el valor por defecto `google.com` para cualquier consulta DNS real. El dominio correcto sí aparece en el ASCII de la Capa 7. Corrección propuesta: incluir `DNSQR.qname` en `summary.info` desde `parse_scapy_packet()`.
 
-*Figura 2: `[Insertar capturas del Inspector OSI — DNS y ARP]`*
+![Captura del Inspector OSI — Escenario B](Escenario%20B.png)
+*Figura 2: Captura del Inspector OSI — Escenario B (Resolución de nombres DNS sobre UDP y descubrimiento ARP en red local)*
 
 ---
 
@@ -743,7 +745,8 @@ flowchart LR
 
 **Criterio diagnóstico:** si aparecen *Echo Request* sin *Echo Reply* (Type 0), hay pérdida en el camino o el destino filtra ICMP; si el TTL de la respuesta es 64 se infiere un destino Linux/router, y si es 128, un host Windows (sin saltos intermedios en la LAN).
 
-*Figura 3: `[Insertar captura del Inspector OSI — Escenario C]`*
+![Captura del Inspector OSI — Escenario C](Escenario%20C.png)
+*Figura 3: Captura del Inspector OSI — Escenario C (Diagnóstico de conectividad con Ping / ICMP en Capa 3 sin puertos de Capa 4)*
 
 ---
 
